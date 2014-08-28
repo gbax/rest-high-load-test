@@ -33,7 +33,7 @@ class Units {
             uri.path = s
             uri.query = [page: 1, per_page: 5]
             response.success = { resp, json ->
-                println "done get topic/message " + resp.statusLine
+                println "done | testGetMessages | ${s} | status" + resp.statusLine
                 assert resp.statusLine.statusCode == 200
                 assert json.readLine().size() > 0
             }
@@ -41,7 +41,7 @@ class Units {
                 if (resp.statusLine.statusCode != 404) {
                     println "testGetMessages: ${s} Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}"
                 } else {
-                    println "done getMessages: ${s} with ${resp.statusLine.statusCode}"
+                    println "done | testGetMessages | ${s} | status ${resp.statusLine.statusCode}"
                 }
 
             }
@@ -58,13 +58,15 @@ class Units {
             send JSON, [message: "test " + nextInt]
 
             response.success = { resp ->
-                println "done add /topic/messages/ POST response status: ${resp.statusLine}"
+                println "done | testAddMessage | ${s} | status: ${resp.statusLine}"
                 assert resp.statusLine.statusCode == 201
             }
 
             response.failure = { resp ->
                 if (resp.statusLine.statusCode != 404) {
-                    println "testAddMessage: ${s}. Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}"
+                    println "testAddMessage: ${s} Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}"
+                } else {
+                    println "done | testAddMessage | ${s} | status: ${resp.statusLine}"
                 }
 
                 assert resp.statusLine.statusCode == 404
@@ -75,19 +77,21 @@ class Units {
     def testDelMessage() {
         def http = getHttp()
         final nextInt = new Random().nextInt(20)
-        final s = "/topic/messages/" + nextInt + "/" + new Random().nextInt(10)
+        final s = "/topic/messages/" + nextInt + "/" + new Random().nextInt(400)
         try {
             http.request(DELETE) {
                 uri.path = s
 
                 response.success = { resp ->
-                    println "done delete message ${s}. POST response status: ${resp.statusLine}"
+                    println "done | testDelMessage | message ${s} | status: ${resp.statusLine}"
                     assert resp.statusLine.statusCode == 200
                 }
 
                 response.failure = { resp ->
                     if (resp.statusLine.statusCode != 404) {
                         println "testDelMessage: ${s} Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}"
+                    } else {
+                        println "done | testDelMessage | message ${s} | status: ${resp.statusLine}"
                     }
                     assert resp.statusLine.statusCode == 404
                 }
@@ -101,7 +105,7 @@ class Units {
         def http = getHttp()
         final s = '/topic/' + new Random().nextInt(20)
         def html = http.get(path: s)
-        println "done ${s}"
+        println "done | testGetTopic | ${s}"
         assert html instanceof GPathResult
         assert html.HEAD.size() == 1
         assert html.BODY.size() == 1
@@ -113,7 +117,7 @@ class Units {
             uri.path = '/topics'
             uri.query = [page: 1, per_page: 5]
             response.success = { resp, json ->
-                println "done get topics " + resp.statusLine
+                println "done | testGetTopics | " + resp.statusLine
                 assert resp.statusLine.statusCode == 200
                 assert json.readLine().size() > 0
             }
@@ -133,7 +137,7 @@ class Units {
             send JSON, [description: "test " + nextInt]
 
             response.success = { resp ->
-                println "done add /topics POST response status: ${resp.statusLine}"
+                println "done | testAddTopic | ${nextInt} | status: ${resp.statusLine}"
                 assert resp.statusLine.statusCode == 201
             }
 
@@ -152,13 +156,15 @@ class Units {
                 uri.path = s
 
                 response.success = { resp ->
-                    println "done delete topic ${s}. POST response status: ${resp.statusLine}"
+                    println "done | testDelTopic | ${s} | status: ${resp.statusLine}"
                     assert resp.statusLine.statusCode == 200
                 }
 
                 response.failure = { resp ->
                     if (resp.statusLine.statusCode != 404) {
                         println "testDelTopic: ${s} Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}"
+                    } else {
+                        println "done | testDelTopic | ${s} | status: ${resp.statusLine}"
                     }
                     assert resp.statusLine.statusCode == 404
                 }
