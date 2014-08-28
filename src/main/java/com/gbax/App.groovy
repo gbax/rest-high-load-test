@@ -14,7 +14,7 @@ class App {
         println "run"
         CountDownLatch countDownLatch = new CountDownLatch(1);
         ExecutorService service = Executors.newCachedThreadPool();
-        for (int i = 0; i < 300; i++) {
+        for (int i = 0; i < 1000; i++) {
             service.submit(new RunUnits(countDownLatch, i));
         }
         countDownLatch.countDown()
@@ -25,7 +25,7 @@ class App {
         CountDownLatch countDownLatch;
         final int num;
 
-        public RunUnits(def countDownLatch, def num){
+        public RunUnits(def countDownLatch, def num) {
             this.countDownLatch = countDownLatch
             this.num = ++num
         }
@@ -33,8 +33,10 @@ class App {
         public void run() {
             final units = new Units();
             countDownLatch.await()
-            units.doSomthing()
-            units.doSomthing()
+            for (int i = 0; i < 10; i++) {
+                units.doSomthing()
+            }
+
             println "runned " + num
         }
     }
